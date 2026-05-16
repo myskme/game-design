@@ -1,0 +1,2705 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>梦幻城堡课堂积分器</title>
+<style>
+:root{
+  --night:#030714;
+  --midnight:#071126;
+  --violet:#6f4dff;
+  --rose:#ff4fb3;
+  --gold:#ffd36b;
+  --mint:#61ffd3;
+  --sky:#60d6ff;
+  --coral:#ff806a;
+  --ink:#172032;
+  --paper:#fff8e8;
+  --white:#ffffff;
+  --glass:rgba(7,12,30,.52);
+  --glass-strong:rgba(255,255,255,.16);
+  --line:rgba(255,255,255,.18);
+  --shadow:0 24px 70px rgba(0,0,0,.46);
+  --radius:8px;
+}
+
+*{box-sizing:border-box}
+html,body{min-height:100%;margin:0}
+body{
+  position:relative;
+  font-family: Inter, "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  color:var(--white);
+  background:
+    linear-gradient(180deg, rgba(3,7,20,.62), rgba(3,7,20,.88)),
+    url("assets/castle-harbor-hero.png") center / cover fixed no-repeat,
+    #030714;
+  overflow-x:hidden;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-4;
+  pointer-events:none;
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255,79,179,.32), transparent 26%),
+    radial-gradient(circle at 78% 8%, rgba(96,214,255,.22), transparent 30%),
+    linear-gradient(90deg, rgba(3,7,20,.78), rgba(3,7,20,.22) 45%, rgba(3,7,20,.74));
+}
+body:after{
+  content:"";
+  position:fixed;
+  inset:0;
+  z-index:-3;
+  pointer-events:none;
+  opacity:.13;
+  background-image:linear-gradient(rgba(255,255,255,.42) 1px, transparent 1px);
+  background-size:100% 4px;
+  mix-blend-mode:overlay;
+}
+
+button,input,select{font:inherit}
+button{
+  border:0;
+  color:inherit;
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+.app{
+  min-height:100vh;
+  position:relative;
+  isolation:isolate;
+  padding:18px;
+  display:grid;
+  grid-template-rows:auto 1fr;
+  gap:14px;
+}
+
+.sky-layer,.fireworks-layer,.confetti-layer{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+}
+.sky-layer{z-index:-2;overflow:hidden;opacity:.34}
+.fireworks-layer{z-index:5}
+.confetti-layer{z-index:10;overflow:hidden}
+
+.moon{
+  position:absolute;
+  width:82px;
+  height:82px;
+  right:7vw;
+  top:42px;
+  border-radius:50%;
+  background:radial-gradient(circle at 32% 30%, #fff 0 16%, #ffe69b 18% 62%, #d58a30 100%);
+  box-shadow:0 0 46px rgba(255,234,168,.8);
+}
+.stars span{
+  position:absolute;
+  width:3px;
+  height:3px;
+  border-radius:50%;
+  background:#fff;
+  opacity:.85;
+  animation:twinkle 2.7s infinite ease-in-out;
+}
+.stars span:nth-child(1){left:8%;top:12%;animation-delay:.1s}
+.stars span:nth-child(2){left:18%;top:26%;animation-delay:.8s}
+.stars span:nth-child(3){left:38%;top:9%;animation-delay:1.3s}
+.stars span:nth-child(4){left:56%;top:17%;animation-delay:.5s}
+.stars span:nth-child(5){left:73%;top:33%;animation-delay:1.8s}
+.stars span:nth-child(6){left:88%;top:24%;animation-delay:1s}
+.stars span:nth-child(7){left:46%;top:38%;animation-delay:2.1s}
+.stars span:nth-child(8){left:26%;top:6%;animation-delay:1.6s}
+
+@keyframes twinkle{
+  0%,100%{transform:scale(1);opacity:.35}
+  50%{transform:scale(2.2);opacity:1}
+}
+
+.header{
+  display:grid;
+  grid-template-columns:1fr auto;
+  gap:14px;
+  align-items:center;
+  padding:12px 14px;
+  border:1px solid rgba(255,255,255,.18);
+  background:linear-gradient(135deg, rgba(7,12,30,.72), rgba(255,255,255,.08));
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(22px) saturate(1.35);
+  border-radius:var(--radius);
+}
+
+.brand{
+  display:flex;
+  gap:12px;
+  align-items:center;
+  min-width:0;
+}
+.crest{
+  width:48px;
+  height:48px;
+  position:relative;
+  flex:0 0 auto;
+  filter:drop-shadow(0 8px 18px rgba(255,211,107,.25));
+}
+.crest:before{
+  content:"";
+  position:absolute;
+  inset:8px 6px 4px;
+  border-radius:7px 7px 5px 5px;
+  background:linear-gradient(135deg, var(--gold), #fff1ad 46%, var(--rose));
+  clip-path:polygon(7% 100%, 7% 38%, 21% 38%, 21% 22%, 35% 22%, 35% 2%, 48% 2%, 48% 30%, 62% 30%, 62% 14%, 78% 14%, 78% 40%, 93% 40%, 93% 100%);
+}
+.crest:after{
+  content:"";
+  position:absolute;
+  left:17px;
+  top:19px;
+  width:14px;
+  height:20px;
+  border-radius:8px 8px 2px 2px;
+  background:rgba(16,24,63,.78);
+}
+
+h1{
+  margin:0;
+  font-size:clamp(24px, 3.4vw, 48px);
+  line-height:1.02;
+  letter-spacing:0;
+  text-shadow:0 0 28px rgba(96,214,255,.24);
+}
+.subtitle{
+  margin-top:4px;
+  color:rgba(255,255,255,.8);
+  font-size:13px;
+}
+
+.top-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  justify-content:flex-end;
+}
+.chip,.ghost-btn,.primary-btn{
+  min-height:38px;
+  border-radius:var(--radius);
+  padding:0 12px;
+  background:rgba(8,14,34,.5);
+  border:1px solid rgba(255,255,255,.18);
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#fff;
+  transition:transform .16s ease, background .16s ease, box-shadow .16s ease;
+}
+.chip:hover,.ghost-btn:hover,.primary-btn:hover{transform:translateY(-1px);background:rgba(255,255,255,.16);box-shadow:0 0 22px rgba(96,214,255,.18)}
+.primary-btn{
+  background:linear-gradient(135deg, var(--rose), var(--violet) 48%, var(--sky));
+  box-shadow:0 12px 30px rgba(255,79,179,.24), inset 0 1px 0 rgba(255,255,255,.32);
+}
+
+.main{
+  display:grid;
+  grid-template-columns:minmax(280px, 340px) minmax(0,1fr) minmax(280px, 340px);
+  gap:14px;
+  min-height:0;
+}
+.aux-tabs{
+  display:none;
+}
+
+.panel{
+  border:1px solid rgba(255,255,255,.16);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,.12), rgba(255,255,255,.045)),
+    rgba(3,7,20,.52);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(24px) saturate(1.35);
+  overflow:hidden;
+}
+.panel-title{
+  padding:13px 14px 10px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.panel-title h2{
+  margin:0;
+  font-size:16px;
+  letter-spacing:0;
+}
+.tab-btn.active{
+  background:linear-gradient(135deg, rgba(255,211,107,.28), rgba(96,214,255,.18));
+  border-color:rgba(255,211,107,.45);
+  box-shadow:0 0 18px rgba(255,211,107,.18);
+}
+
+.setup{
+  padding:14px;
+  display:grid;
+  gap:12px;
+}
+.field{
+  display:grid;
+  gap:6px;
+}
+.field label{
+  color:rgba(255,255,255,.76);
+  font-size:12px;
+}
+.field input,.field select{
+  width:100%;
+  min-height:40px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.18);
+  background:rgba(3,7,20,.46);
+  color:#fff;
+  padding:0 10px;
+  outline:none;
+}
+.field input:focus,.field select:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(255,211,107,.14)}
+.name-grid{
+  display:grid;
+  gap:8px;
+}
+.name-row{
+  display:grid;
+  grid-template-columns:30px 1fr;
+  gap:8px;
+  align-items:center;
+}
+.role-select{
+  grid-column:2;
+}
+.token{
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  color:#071126;
+  font-weight:800;
+  background:var(--gold);
+}
+
+.stage{
+  min-height:760px;
+  display:grid;
+  grid-template-rows:auto minmax(300px, .88fr) auto auto;
+  overflow:hidden;
+  position:relative;
+}
+.score-ribbon{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  padding:12px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.stat{
+  border-radius:var(--radius);
+  background:rgba(5,11,25,.28);
+  border:1px solid rgba(255,255,255,.14);
+  padding:10px;
+  min-width:0;
+}
+.stat small{display:block;color:rgba(255,255,255,.65);font-size:11px}
+.stat strong{display:block;font-size:20px;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.castle-scene{
+  position:relative;
+  overflow:hidden;
+  min-height:390px;
+  background:
+    linear-gradient(180deg, rgba(3,7,20,.05), rgba(3,7,20,.38) 62%, rgba(3,7,20,.78)),
+    radial-gradient(circle at 28% 18%, rgba(255,79,179,.18), transparent 24%),
+    url("assets/castle-harbor-hero.png") center 42% / cover no-repeat;
+  border-bottom:1px solid rgba(255,255,255,.14);
+}
+.castle-scene:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:
+    linear-gradient(90deg, rgba(3,7,20,.48), transparent 26%, transparent 72%, rgba(3,7,20,.42)),
+    linear-gradient(0deg, rgba(3,7,20,.72), transparent 36%);
+}
+.aurora{
+  position:absolute;
+  inset:-30% -10% auto;
+  height:220px;
+  opacity:.62;
+  background:
+    linear-gradient(105deg, transparent 0 18%, rgba(115,245,195,.23) 28%, transparent 43%),
+    linear-gradient(72deg, transparent 0 26%, rgba(228,90,157,.24) 40%, transparent 58%),
+    linear-gradient(95deg, transparent 0 38%, rgba(120,215,255,.2) 52%, transparent 68%);
+  filter:blur(12px);
+  animation:aurora 8s ease-in-out infinite alternate;
+}
+@keyframes aurora{
+  from{transform:translateX(-4%) skewX(-7deg)}
+  to{transform:translateX(4%) skewX(7deg)}
+}
+.sparkle-dust span{
+  position:absolute;
+  width:8px;
+  height:8px;
+  background:var(--gold);
+  clip-path:polygon(50% 0,62% 38%,100% 50%,62% 62%,50% 100%,38% 62%,0 50%,38% 38%);
+  opacity:.85;
+  animation:drift 5.5s ease-in-out infinite;
+}
+.sparkle-dust span:nth-child(1){left:12%;top:24%;animation-delay:.2s}
+.sparkle-dust span:nth-child(2){left:28%;top:42%;animation-delay:1.4s;background:var(--sky)}
+.sparkle-dust span:nth-child(3){left:62%;top:22%;animation-delay:.8s;background:var(--rose)}
+.sparkle-dust span:nth-child(4){left:79%;top:46%;animation-delay:2.1s;background:var(--mint)}
+.sparkle-dust span:nth-child(5){left:47%;top:16%;animation-delay:3s}
+@keyframes drift{
+  0%,100%{transform:translateY(0) rotate(0) scale(.8);opacity:.35}
+  50%{transform:translateY(-18px) rotate(90deg) scale(1.35);opacity:1}
+}
+.lantern{
+  position:absolute;
+  top:26px;
+  width:38px;
+  height:48px;
+  border-radius:18px 18px 14px 14px;
+  background:linear-gradient(180deg, #fff0a8, #ff7b86 52%, #d83a76);
+  box-shadow:0 0 28px rgba(255,130,110,.55);
+  animation:lantern 4.6s ease-in-out infinite;
+}
+.lantern:before{
+  content:"";
+  position:absolute;
+  left:50%;
+  top:-25px;
+  width:1px;
+  height:26px;
+  background:rgba(255,255,255,.35);
+}
+.lantern:after{
+  content:"";
+  position:absolute;
+  left:11px;
+  right:11px;
+  bottom:-9px;
+  height:12px;
+  border-radius:50%;
+  background:#ffd36b;
+}
+.lantern.one{left:9%}
+.lantern.two{right:12%;animation-delay:1.3s;background:linear-gradient(180deg, #fff0a8, #78d7ff 52%, #3f6bff)}
+@keyframes lantern{
+  0%,100%{transform:translateY(0) rotate(-3deg)}
+  50%{transform:translateY(12px) rotate(4deg)}
+}
+.harbor{
+  position:absolute;
+  left:0;
+  right:0;
+  bottom:0;
+  height:88px;
+  background:linear-gradient(180deg, rgba(120,215,255,.08), rgba(115,245,195,.17));
+  border-top:1px solid rgba(255,255,255,.14);
+}
+.water-line{
+  position:absolute;
+  inset:14px 0 auto;
+  height:1px;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,.55), transparent);
+  animation:water 4s linear infinite;
+}
+@keyframes water{
+  from{transform:translateX(-30%)}
+  to{transform:translateX(30%)}
+}
+.skyline{
+  position:absolute;
+  left:4%;
+  right:4%;
+  bottom:78px;
+  height:86px;
+  display:flex;
+  align-items:flex-end;
+  gap:5px;
+  opacity:0;
+}
+.building{
+  flex:1;
+  min-width:14px;
+  background:linear-gradient(180deg, rgba(120,215,255,.32), rgba(255,255,255,.08));
+  border:1px solid rgba(255,255,255,.12);
+  border-bottom:0;
+}
+.building:nth-child(1){height:38px}.building:nth-child(2){height:64px}.building:nth-child(3){height:48px}.building:nth-child(4){height:78px}.building:nth-child(5){height:55px}.building:nth-child(6){height:70px}.building:nth-child(7){height:44px}.building:nth-child(8){height:60px}
+
+.castle{
+  position:absolute;
+  left:50%;
+  bottom:56px;
+  width:min(520px, 82%);
+  height:270px;
+  transform:translateX(-50%);
+  filter:drop-shadow(0 24px 35px rgba(0,0,0,.32));
+  display:none;
+}
+.castle-base{
+  position:absolute;
+  left:16%;
+  right:16%;
+  bottom:0;
+  height:76px;
+  border-radius:9px 9px 3px 3px;
+  background:linear-gradient(135deg, #f7d78a, #fff1c4 48%, #d38bda 100%);
+}
+.castle-keep{
+  position:absolute;
+  left:34%;
+  right:34%;
+  bottom:56px;
+  height:134px;
+  border-radius:9px 9px 2px 2px;
+  background:linear-gradient(135deg, #ffe7a1, #fff7d2 48%, #dc8fd1 100%);
+}
+.castle-keep:before,.castle-keep:after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  width:34px;
+  height:102px;
+  background:linear-gradient(135deg, #ffd579, #ffeec4);
+  border-radius:8px 8px 2px 2px;
+}
+.castle-keep:before{left:-46px}.castle-keep:after{right:-46px}
+.tower{
+  position:absolute;
+  bottom:54px;
+  width:62px;
+  height:150px;
+  border-radius:10px 10px 3px 3px;
+  background:linear-gradient(135deg, #ffd579, #fff3bc 45%, #c98be8);
+}
+.tower.left{left:18%}.tower.right{right:18%}
+.tower:before,.castle-keep:before,.castle-keep:after{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22);
+}
+.roof{
+  position:absolute;
+  width:0;
+  height:0;
+  border-left:38px solid transparent;
+  border-right:38px solid transparent;
+  border-bottom:74px solid #6b4ad8;
+  filter:drop-shadow(0 -4px 12px rgba(120,215,255,.25));
+}
+.roof.left{left:calc(18% - 7px);bottom:194px}
+.roof.right{right:calc(18% - 7px);bottom:194px}
+.roof.center{
+  left:50%;
+  transform:translateX(-50%);
+  bottom:186px;
+  border-left-width:54px;
+  border-right-width:54px;
+  border-bottom-width:92px;
+  border-bottom-color:#e45a9d;
+}
+.gate{
+  position:absolute;
+  left:50%;
+  bottom:0;
+  width:58px;
+  height:62px;
+  transform:translateX(-50%);
+  border-radius:28px 28px 3px 3px;
+  background:linear-gradient(180deg, #172032, #071126);
+  box-shadow:0 -8px 22px rgba(255,255,255,.22);
+}
+.flag{
+  position:absolute;
+  left:50%;
+  bottom:270px;
+  width:54px;
+  height:30px;
+  background:linear-gradient(135deg, var(--gold), var(--rose));
+  clip-path:polygon(0 0,100% 12%,72% 50%,100% 88%,0 100%);
+  animation:flag 1.8s ease-in-out infinite;
+  transform-origin:left center;
+}
+@keyframes flag{
+  0%,100%{transform:translateX(-6px) skewY(-5deg)}
+  50%{transform:translateX(-6px) skewY(5deg)}
+}
+.tram,.ferry{
+  position:absolute;
+  bottom:28px;
+  border-radius:5px;
+}
+.tram{
+  left:8%;
+  width:88px;
+  height:42px;
+  background:linear-gradient(135deg, #43c985, #a8ffdf);
+  border:2px solid rgba(255,255,255,.55);
+  animation:tram 11s linear infinite;
+  opacity:.38;
+}
+.tram:before{
+  content:"";
+  position:absolute;
+  inset:8px 9px auto;
+  height:12px;
+  background:repeating-linear-gradient(90deg, rgba(7,17,38,.68) 0 13px, transparent 13px 19px);
+}
+.tram:after{
+  content:"DING";
+  position:absolute;
+  left:16px;
+  bottom:4px;
+  color:#071126;
+  font-size:10px;
+  font-weight:800;
+}
+@keyframes tram{
+  0%{transform:translateX(-180px)}
+  100%{transform:translateX(calc(100vw + 80px))}
+}
+.ferry{
+  right:12%;
+  width:116px;
+  height:34px;
+  background:linear-gradient(180deg, #fff5cf, #63caa9);
+  border-radius:6px 6px 24px 24px;
+  animation:ferry 16s linear infinite reverse;
+  opacity:.3;
+}
+.ferry:before{
+  content:"";
+  position:absolute;
+  left:22px;
+  top:-18px;
+  width:54px;
+  height:22px;
+  border-radius:5px 5px 0 0;
+  background:#fff5cf;
+}
+@keyframes ferry{
+  0%{transform:translateX(-45vw)}
+  100%{transform:translateX(45vw)}
+}
+
+.selector-dock{
+  padding:12px;
+  display:grid;
+  grid-template-columns:minmax(220px, 300px) 1fr;
+  gap:12px;
+  align-items:center;
+  border-top:1px solid rgba(255,255,255,.13);
+  border-bottom:1px solid rgba(255,255,255,.13);
+  background:
+    radial-gradient(circle at 20% 0, rgba(255,79,179,.14), transparent 36%),
+    radial-gradient(circle at 80% 0, rgba(96,214,255,.13), transparent 38%),
+    linear-gradient(90deg, rgba(3,7,20,.72), rgba(11,20,48,.5), rgba(3,7,20,.72));
+}
+.wheel-wrap{
+  display:grid;
+  justify-items:center;
+  gap:9px;
+}
+.wheel-shell{
+  position:relative;
+  width:228px;
+  aspect-ratio:1;
+}
+.wheel-pointer{
+  position:absolute;
+  left:50%;
+  top:-4px;
+  z-index:3;
+  transform:translateX(-50%);
+  width:0;
+  height:0;
+  border-left:14px solid transparent;
+  border-right:14px solid transparent;
+  border-top:30px solid var(--gold);
+  filter:drop-shadow(0 4px 8px rgba(0,0,0,.38));
+}
+.answer-wheel{
+  width:100%;
+  height:100%;
+  border-radius:50%;
+  border:8px solid rgba(255,255,255,.82);
+  background:conic-gradient(var(--rose), var(--sky), var(--mint), var(--gold), #9d7cff, var(--rose));
+  box-shadow:0 18px 42px rgba(0,0,0,.42), 0 0 34px rgba(96,214,255,.22), inset 0 0 0 8px rgba(7,17,38,.18);
+  transition:transform 3.2s cubic-bezier(.08,.72,.12,1);
+  position:relative;
+  overflow:hidden;
+}
+.answer-wheel:before{
+  content:"";
+  position:absolute;
+  inset:16px;
+  border-radius:50%;
+  border:1px dashed rgba(255,255,255,.62);
+}
+.answer-wheel:after{
+  content:"";
+  position:absolute;
+  inset:50%;
+  width:48px;
+  height:48px;
+  transform:translate(-50%,-50%);
+  border-radius:50%;
+  background:linear-gradient(135deg, #fff, var(--gold));
+  box-shadow:0 0 0 8px rgba(7,17,38,.22);
+}
+.wheel-labels{
+  position:absolute;
+  inset:0;
+  z-index:2;
+  pointer-events:none;
+  transform-origin:center;
+  transition:transform 3.2s cubic-bezier(.08,.72,.12,1);
+}
+.wheel-label{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:74px;
+  margin-left:-37px;
+  margin-top:-10px;
+  transform:rotate(var(--angle)) translateY(-76px) rotate(calc(-1 * var(--angle)));
+  text-align:center;
+  font-size:12px;
+  font-weight:900;
+  color:#071126;
+  text-shadow:0 1px 0 rgba(255,255,255,.62);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.selector-info{
+  display:grid;
+  gap:10px;
+  min-width:0;
+}
+.selector-info h2{
+  margin:0;
+  font-size:clamp(20px, 3vw, 34px);
+  letter-spacing:0;
+}
+.selector-info p{
+  margin:0;
+  color:rgba(255,255,255,.78);
+  line-height:1.45;
+}
+.selected-result{
+  min-height:58px;
+  border-radius:var(--radius);
+  padding:12px;
+  background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(96,214,255,.08));
+  border:1px solid rgba(255,255,255,.16);
+  font-size:18px;
+  font-weight:900;
+}
+.selector-actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.answer-all{
+  color:var(--gold);
+}
+
+.players{
+  padding:12px;
+  display:grid;
+  grid-template-columns:repeat(5, minmax(130px, 1fr));
+  gap:10px;
+  align-content:start;
+}
+.player-card{
+  position:relative;
+  overflow:hidden;
+  min-height:268px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.18);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255,255,255,.32), transparent 24%),
+    linear-gradient(160deg, var(--player-color, #8b5cff), rgba(3,7,20,.74) 72%);
+  background:
+    radial-gradient(circle at 18% 10%, rgba(255,255,255,.32), transparent 24%),
+    linear-gradient(160deg, color-mix(in srgb, var(--player-color, #8b5cff) 72%, #030714), rgba(3,7,20,.74) 72%);
+  box-shadow:0 16px 34px rgba(0,0,0,.32), inset 0 1px 0 rgba(255,255,255,.22);
+  padding:12px;
+  display:grid;
+  grid-template-rows:auto auto 1fr auto;
+  gap:10px;
+}
+.player-card.leader{
+  border-color:var(--gold);
+  box-shadow:0 0 0 2px rgba(255,211,107,.22), 0 20px 35px rgba(0,0,0,.28);
+}
+.player-card.selected{
+  border-color:#fff;
+  box-shadow:0 0 0 3px rgba(255,255,255,.3), 0 0 32px rgba(255,211,107,.6), 0 20px 35px rgba(0,0,0,.3);
+  animation:selectedPulse 1.4s ease-in-out infinite;
+}
+.player-card.secret-flash:before{
+  content:"";
+  position:absolute;
+  right:11px;
+  top:11px;
+  width:4px;
+  height:4px;
+  border-radius:50%;
+  background:rgba(255,255,255,.92);
+  box-shadow:0 0 7px rgba(97,255,211,.75);
+  z-index:2;
+  animation:secretBlink .48s ease-out forwards;
+}
+@keyframes secretBlink{
+  0%{opacity:0;transform:scale(.4)}
+  35%{opacity:.9;transform:scale(1)}
+  100%{opacity:0;transform:scale(.2)}
+}
+.player-card.all-answer{
+  box-shadow:0 0 0 2px rgba(115,245,195,.28), 0 0 26px rgba(115,245,195,.38), 0 20px 35px rgba(0,0,0,.28);
+}
+@keyframes selectedPulse{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-5px)}
+}
+.player-card.frozen{
+  filter:saturate(.5);
+}
+.player-card.frozen:after{
+  content:"暂停一回合";
+  position:absolute;
+  inset:0;
+  display:grid;
+  place-items:center;
+  background:rgba(7,17,38,.62);
+  color:#fff;
+  font-weight:900;
+  font-size:20px;
+}
+.player-head{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+}
+.badge{
+  width:36px;
+  height:36px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:rgba(255,255,255,.88);
+  color:#071126;
+  font-weight:900;
+}
+.player-name{
+  margin:0;
+  font-size:15px;
+  line-height:1.15;
+  min-width:0;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  cursor:pointer;
+}
+.rank{
+  font-size:12px;
+  padding:4px 7px;
+  border-radius:999px;
+  background:rgba(7,17,38,.28);
+}
+.role-line{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:8px;
+  min-height:30px;
+}
+.role-pill{
+  min-width:0;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+  border-radius:999px;
+  padding:5px 9px;
+  background:rgba(3,7,20,.34);
+  border:1px solid rgba(255,255,255,.16);
+  font-size:12px;
+  font-weight:900;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.skill-state{
+  font-size:11px;
+  color:rgba(255,255,255,.72);
+  white-space:nowrap;
+}
+.asset-line,.inventory-line{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  min-height:22px;
+  font-size:11px;
+  color:rgba(255,255,255,.76);
+  overflow:hidden;
+}
+.mini-tag{
+  display:inline-flex;
+  align-items:center;
+  max-width:100%;
+  min-height:20px;
+  padding:0 7px;
+  border-radius:999px;
+  background:rgba(3,7,20,.3);
+  border:1px solid rgba(255,255,255,.13);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.score{
+  align-self:center;
+  text-align:center;
+  font-size:clamp(52px, 7vw, 78px);
+  font-weight:950;
+  line-height:.9;
+  text-shadow:0 8px 20px rgba(0,0,0,.38), 0 0 24px rgba(255,255,255,.18);
+}
+.score-label{
+  text-align:center;
+  font-size:12px;
+  color:rgba(255,255,255,.72);
+  margin-top:8px;
+}
+.score-actions{
+  display:grid;
+  grid-template-columns:repeat(6, minmax(0,1fr));
+  gap:8px;
+}
+.score-actions button{
+  min-height:42px;
+  border-radius:var(--radius);
+  font-size:14px;
+  font-weight:900;
+  background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.18);
+}
+.score-actions button[data-score]{
+  grid-column:span 3;
+  font-size:18px;
+}
+.score-actions .skill-btn{
+  grid-column:span 2;
+  background:linear-gradient(135deg, rgba(255,211,107,.26), rgba(96,214,255,.16));
+}
+.score-actions .company-btn{
+  grid-column:span 2;
+  background:linear-gradient(135deg, rgba(97,255,211,.2), rgba(255,211,107,.14));
+}
+.score-actions .card-btn{
+  grid-column:span 2;
+  background:linear-gradient(135deg, rgba(255,79,179,.22), rgba(111,77,255,.18));
+}
+.score-actions button:hover{background:rgba(255,255,255,.32)}
+.score-actions button:disabled{opacity:.45;cursor:not-allowed}
+
+.side-list{
+  padding:12px;
+  display:grid;
+  gap:10px;
+}
+.event-log{
+  max-height:275px;
+  overflow:auto;
+  padding-right:3px;
+}
+.event{
+  padding:10px;
+  border-radius:var(--radius);
+  background:rgba(7,17,38,.25);
+  border:1px solid rgba(255,255,255,.12);
+  margin-bottom:8px;
+  font-size:13px;
+  line-height:1.35;
+}
+.event strong{color:var(--gold)}
+.leaderboard{
+  display:grid;
+  gap:8px;
+}
+.leader-row{
+  display:grid;
+  grid-template-columns:28px 1fr auto;
+  gap:8px;
+  align-items:center;
+  padding:8px;
+  border-radius:var(--radius);
+  background:rgba(7,17,38,.25);
+  border:1px solid rgba(255,255,255,.12);
+}
+.leader-row span:nth-child(2){min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.surprise-board{
+  display:grid;
+  gap:8px;
+  padding:12px;
+}
+.surprise-card{
+  border-radius:var(--radius);
+  min-height:80px;
+  padding:12px;
+  background:linear-gradient(135deg, rgba(255,211,107,.18), rgba(120,215,255,.12));
+  border:1px solid rgba(255,255,255,.18);
+}
+.surprise-card h3{margin:0 0 6px;font-size:15px}
+.surprise-card p{margin:0;color:rgba(255,255,255,.78);font-size:13px;line-height:1.4}
+.memory-strip{
+  display:grid;
+  grid-template-columns:repeat(3, 1fr);
+  gap:8px;
+  margin-top:10px;
+}
+.memory-thumb{
+  position:relative;
+  overflow:hidden;
+  min-height:58px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.2);
+  background:#081022 center / cover no-repeat;
+  box-shadow:0 10px 24px rgba(0,0,0,.24);
+}
+.memory-thumb:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(180deg, transparent 42%, rgba(3,7,20,.78));
+}
+.memory-thumb span{
+  position:absolute;
+  left:7px;
+  right:7px;
+  bottom:6px;
+  z-index:1;
+  font-size:11px;
+  font-weight:800;
+  color:#fff;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.loot-banner{
+  min-height:92px;
+  margin-top:10px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.18);
+  background:url("assets/loot-card-sheet.png") center / cover no-repeat;
+  box-shadow:0 14px 30px rgba(0,0,0,.26);
+}
+.manual-grid{
+  display:grid;
+  gap:9px;
+}
+.manual-item{
+  padding:9px;
+  border-radius:var(--radius);
+  background:rgba(3,7,20,.28);
+  border:1px solid rgba(255,255,255,.12);
+}
+.manual-item strong{
+  display:block;
+  color:var(--gold);
+  font-size:12px;
+  margin-bottom:4px;
+}
+.manual-item span{
+  display:block;
+  color:rgba(255,255,255,.78);
+  font-size:12px;
+  line-height:1.35;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:20;
+  display:none;
+  place-items:center;
+  padding:18px;
+  background:rgba(4,8,18,.68);
+  backdrop-filter:blur(12px);
+}
+.modal.open{display:grid}
+.modal-card{
+  width:min(620px, 100%);
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.22);
+  background:
+    radial-gradient(circle at 50% 0, rgba(255,211,107,.24), transparent 36%),
+    linear-gradient(180deg, rgba(28,38,82,.96), rgba(9,15,36,.98));
+  box-shadow:0 28px 80px rgba(0,0,0,.5);
+  overflow:hidden;
+}
+.modal-top{
+  padding:18px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.modal-top h2{margin:0;font-size:22px}
+.close-btn{
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  background:rgba(255,255,255,.13);
+  border:1px solid rgba(255,255,255,.18);
+}
+.box-area{
+  padding:24px 18px 18px;
+  display:grid;
+  justify-items:center;
+  gap:18px;
+}
+.mystery-box{
+  width:180px;
+  height:160px;
+  position:relative;
+  transform-style:preserve-3d;
+  animation:boxFloat 2.2s ease-in-out infinite;
+}
+@keyframes boxFloat{
+  0%,100%{transform:translateY(0) rotate(-2deg)}
+  50%{transform:translateY(-10px) rotate(2deg)}
+}
+.mystery-box .lid{
+  position:absolute;
+  left:8px;
+  right:8px;
+  top:6px;
+  height:48px;
+  border-radius:7px;
+  background:linear-gradient(135deg, var(--rose), #8b5cff);
+  box-shadow:0 10px 0 rgba(0,0,0,.12);
+  transition:transform .45s ease;
+}
+.mystery-box .body{
+  position:absolute;
+  left:18px;
+  right:18px;
+  bottom:0;
+  height:118px;
+  border-radius:8px;
+  background:linear-gradient(135deg, var(--gold), #fff0a8);
+}
+.mystery-box .ribbon-v{
+  position:absolute;
+  left:50%;
+  top:8px;
+  bottom:0;
+  width:28px;
+  transform:translateX(-50%);
+  background:linear-gradient(180deg, #7a4cff, var(--rose));
+}
+.mystery-box .ribbon-h{
+  position:absolute;
+  left:18px;
+  right:18px;
+  top:78px;
+  height:24px;
+  background:linear-gradient(90deg, #7a4cff, var(--rose));
+}
+.modal.open.revealed .mystery-box .lid{transform:translateY(-62px) rotate(-12deg)}
+.result{
+  min-height:118px;
+  width:100%;
+  border-radius:var(--radius);
+  padding:16px;
+  background:rgba(255,255,255,.12);
+  border:1px solid rgba(255,255,255,.15);
+  text-align:center;
+}
+.result h3{margin:0 0 8px;font-size:24px;color:var(--gold)}
+.result p{margin:0;color:rgba(255,255,255,.82);line-height:1.5}
+.result-art{
+  width:min(360px, 100%);
+  aspect-ratio:16 / 10;
+  object-fit:cover;
+  display:block;
+  margin:0 auto 12px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.22);
+  box-shadow:0 16px 36px rgba(0,0,0,.28);
+}
+.result-art.sticker{
+  object-fit:contain;
+  background:radial-gradient(circle at 50% 30%, rgba(255,255,255,.12), rgba(3,7,20,.4));
+}
+.rarity-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:28px;
+  border-radius:999px;
+  padding:0 11px;
+  margin-bottom:10px;
+  font-size:13px;
+  font-weight:900;
+  color:#071126;
+  background:var(--rarity-color, var(--gold));
+  box-shadow:0 0 20px rgba(255,211,107,.35);
+}
+.result.common{--rarity-color:#d7deea}
+.result.rare{--rarity-color:#78d7ff}
+.result.epic{--rarity-color:#b28cff}
+.result.legend{--rarity-color:#ffd36b}
+.result.mythic{--rarity-color:#ff6fb7}
+
+.toast{
+  position:fixed;
+  left:50%;
+  top:86px;
+  z-index:30;
+  transform:translateX(-50%) translateY(-18px);
+  opacity:0;
+  transition:opacity .2s ease, transform .2s ease;
+  max-width:min(680px, calc(100vw - 28px));
+  padding:12px 16px;
+  border-radius:var(--radius);
+  border:1px solid rgba(255,255,255,.24);
+  background:rgba(7,17,38,.86);
+  box-shadow:var(--shadow);
+  color:#fff;
+  text-align:center;
+  pointer-events:none;
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+.confetti{
+  position:absolute;
+  width:8px;
+  height:14px;
+  border-radius:2px;
+  animation:fall 1.25s linear forwards;
+}
+@keyframes fall{
+  0%{transform:translateY(-20px) rotate(0);opacity:1}
+  100%{transform:translateY(100vh) rotate(520deg);opacity:0}
+}
+
+@media (max-width:1180px){
+  body{background-attachment:scroll}
+  .app{padding:10px;gap:10px}
+  .header{padding:10px 12px}
+  h1{font-size:clamp(22px, 3vw, 34px)}
+  .subtitle{font-size:12px}
+  .top-actions{gap:7px}
+  .top-actions .chip,.top-actions .ghost-btn,.top-actions .primary-btn{min-height:34px;padding:0 10px}
+  .main{grid-template-columns:1fr;gap:10px}
+  .stage{order:1;min-height:auto}
+  .aux-tabs{
+    order:2;
+    display:flex;
+    gap:7px;
+    overflow-x:auto;
+    padding:2px 0;
+    scrollbar-width:none;
+  }
+  .aux-tabs::-webkit-scrollbar{display:none}
+  .aux-tabs .tab-btn{flex:0 0 auto;min-height:36px}
+  .settings-panel,.right-panel{order:3;grid-column:auto;display:none}
+  body[data-aux-tab="settings"] .settings-panel{display:block}
+  body[data-aux-tab="board"] .right-panel,
+  body[data-aux-tab="events"] .right-panel,
+  body[data-aux-tab="manual"] .right-panel,
+  body[data-aux-tab="easter"] .right-panel{display:block}
+  body[data-aux-tab="board"] .right-panel .event-section,
+  body[data-aux-tab="board"] .right-panel .manual-section,
+  body[data-aux-tab="board"] .right-panel .easter-section{display:none}
+  body[data-aux-tab="events"] .right-panel .leader-section,
+  body[data-aux-tab="events"] .right-panel .manual-section,
+  body[data-aux-tab="events"] .right-panel .easter-section{display:none}
+  body[data-aux-tab="manual"] .right-panel .leader-section,
+  body[data-aux-tab="manual"] .right-panel .event-section,
+  body[data-aux-tab="manual"] .right-panel .easter-section{display:none}
+  body[data-aux-tab="easter"] .right-panel .leader-section,
+  body[data-aux-tab="easter"] .right-panel .event-section,
+  body[data-aux-tab="easter"] .right-panel .manual-section{display:none}
+  .score-ribbon{padding:9px;gap:7px}
+  .stat{padding:8px}
+  .stat strong{font-size:18px}
+  .castle-scene{min-height:clamp(120px, 18vh, 170px)}
+  .selector-dock{grid-template-columns:210px 1fr;padding:9px;gap:10px}
+  .selector-info h2{font-size:22px}
+  .selector-info p{display:none}
+  .selected-result{min-height:44px;font-size:16px;padding:10px}
+  .selector-actions{gap:7px}
+  .selector-actions .ghost-btn,.selector-actions .chip{min-height:34px;padding:0 10px}
+  .players{grid-template-columns:repeat(auto-fit, minmax(148px,1fr));padding:9px;gap:8px}
+  .player-card{min-height:206px;padding:9px;gap:6px}
+  .player-name{font-size:14px}
+  .role-pill,.skill-state,.asset-line,.inventory-line{font-size:10px}
+  .score{font-size:clamp(38px, 5vw, 56px)}
+  .score-label{margin-top:4px}
+  .score-actions{gap:6px}
+  .score-actions button{min-height:34px;font-size:12px}
+  .score-actions button[data-score]{font-size:17px}
+  .side-list{grid-template-columns:1fr}
+  .event-log{max-height:220px}
+  .wheel-shell{width:176px}
+  .wheel-label{transform:rotate(var(--angle)) translateY(-64px) rotate(calc(-1 * var(--angle)))}
+}
+@media (max-width:900px){
+  .header{grid-template-columns:1fr}
+  .top-actions{justify-content:flex-start}
+  .main{grid-template-columns:1fr}
+  .stage{min-height:auto}
+  .selector-dock{grid-template-columns:1fr}
+  .players{grid-template-columns:repeat(2, minmax(135px,1fr))}
+  .side-list{grid-template-columns:1fr}
+  .memory-strip{grid-template-columns:repeat(4, 1fr)}
+}
+@media (max-width:560px){
+  .app{padding:10px}
+  .score-ribbon{grid-template-columns:1fr}
+  .players{grid-template-columns:1fr}
+  .castle{width:96%;height:245px}
+  .castle-scene{min-height:250px}
+  .wheel-shell{width:178px}
+  .wheel-label{transform:rotate(var(--angle)) translateY(-64px) rotate(calc(-1 * var(--angle)))}
+  .moon{width:58px;height:58px;top:92px}
+  .top-actions .chip,.top-actions .ghost-btn,.top-actions .primary-btn{flex:1 1 auto}
+  .memory-strip{grid-template-columns:repeat(2, 1fr)}
+}
+</style>
+</head>
+<body>
+<div class="sky-layer">
+  <div class="moon"></div>
+  <div class="stars">
+    <span></span><span></span><span></span><span></span>
+    <span></span><span></span><span></span><span></span>
+  </div>
+</div>
+<canvas id="fireworks" class="fireworks-layer"></canvas>
+<div id="confetti" class="confetti-layer"></div>
+<div id="toast" class="toast"></div>
+
+<div class="app">
+  <header class="header">
+    <div class="brand">
+      <div class="crest" aria-hidden="true"></div>
+      <div>
+        <h1>梦幻城堡课堂积分器</h1>
+        <div class="subtitle">2-5 位玩家 · 加分竞赛 · 香港彩蛋 · 盲盒惊喜 · 烟花庆祝</div>
+      </div>
+    </div>
+    <div class="top-actions">
+      <button class="chip" id="soundBtn" type="button">声音：开</button>
+      <button class="ghost-btn" id="undoBtn" type="button" title="撤回最近一次加分、技能、开店、盲盒或转盘操作">撤回上一步</button>
+      <button class="ghost-btn" id="resetBtn" type="button">重置</button>
+      <button class="primary-btn" id="mysteryBtn" type="button">打开盲盒</button>
+    </div>
+  </header>
+
+  <main class="main">
+    <section class="panel settings-panel">
+      <div class="panel-title">
+        <h2>玩家设置</h2>
+        <span class="chip" id="roundInfo">第 1 回合</span>
+      </div>
+      <div class="setup">
+        <div class="field">
+          <label for="playerCount">玩家人数</label>
+          <select id="playerCount">
+            <option value="2">2 位玩家</option>
+            <option value="3">3 位玩家</option>
+            <option value="4" selected>4 位玩家</option>
+            <option value="5">5 位玩家</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>玩家名字</label>
+          <div class="name-grid" id="nameGrid"></div>
+        </div>
+        <button class="primary-btn" id="applyNames" type="button">应用名字</button>
+        <div class="surprise-card">
+          <h3>课堂玩法</h3>
+          <p>老师点击每位玩家的 +1 或 +2。加分时有机会自动触发事件，也可以随时手动打开盲盒。</p>
+        </div>
+        <div class="surprise-card">
+          <h3>原创乐园提示</h3>
+          <p>这个版本使用原创梦幻城堡、烟花、维港、叮叮车、天星小轮和点心元素，适合课堂投屏使用。</p>
+        </div>
+        <div class="surprise-card">
+          <h3>王老师的香港记忆</h3>
+          <p>盲盒里藏着真实旅程照片和彩蛋贴纸，抽到时会变成课堂里的小惊喜。</p>
+          <div class="memory-strip">
+            <div class="memory-thumb" style="background-image:url('assets/memories/soft-serve-1.jpg')"><span>雪糕碰杯</span></div>
+            <div class="memory-thumb" style="background-image:url('assets/memories/disney-drink.jpg')"><span>乐园饮品</span></div>
+            <div class="memory-thumb" style="background-image:url('assets/memories/hk-breakfast.jpg')"><span>港式早餐</span></div>
+          </div>
+        </div>
+        <div class="surprise-card">
+          <h3>职业策略</h3>
+          <p>职业现在有被动和 3 回合冷却技能。答题可能掉宝箱；攒到 3 分可以开公司，别人路过会交租。</p>
+          <div class="loot-banner" aria-hidden="true"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel stage">
+      <div class="score-ribbon">
+        <div class="stat"><small>当前领先</small><strong id="leaderName">准备中</strong></div>
+        <div class="stat"><small>最高分</small><strong id="topScore">0</strong></div>
+        <div class="stat"><small>下一次惊喜概率</small><strong id="chanceText">35%</strong></div>
+      </div>
+      <div class="castle-scene" aria-hidden="true">
+        <div class="aurora"></div>
+        <div class="sparkle-dust"><span></span><span></span><span></span><span></span><span></span></div>
+        <div class="lantern one"></div>
+        <div class="lantern two"></div>
+        <div class="skyline">
+          <div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div>
+          <div class="building"></div><div class="building"></div><div class="building"></div><div class="building"></div>
+        </div>
+        <div class="castle">
+          <div class="flag"></div>
+          <div class="roof center"></div>
+          <div class="roof left"></div>
+          <div class="roof right"></div>
+          <div class="tower left"></div>
+          <div class="tower right"></div>
+          <div class="castle-keep"></div>
+          <div class="castle-base"></div>
+          <div class="gate"></div>
+        </div>
+        <div class="harbor"><div class="water-line"></div></div>
+        <div class="tram"></div>
+        <div class="ferry"></div>
+      </div>
+      <div class="selector-dock">
+        <div class="wheel-wrap">
+          <div class="wheel-shell">
+            <div class="wheel-pointer"></div>
+            <div class="answer-wheel" id="answerWheel"></div>
+            <div class="wheel-labels" id="wheelLabels"></div>
+          </div>
+          <button class="primary-btn" id="spinBtn" type="button">命运转盘：选答题者</button>
+        </div>
+        <div class="selector-info">
+          <h2>谁来答题？</h2>
+          <p>先转动命运转盘。抽到单人时，那位玩家获得答题机会；抽到“全员抢答”时，所有人都可以举手抢答。</p>
+          <div class="selected-result" id="selectedResult">还没有选中答题者。</div>
+          <div class="selector-actions">
+            <button class="ghost-btn" id="clearSelectionBtn" type="button">清除选中</button>
+            <button class="ghost-btn" id="quickUndoBtn" type="button">撤回</button>
+            <button class="ghost-btn" id="allPlusOneBtn" type="button">抢答全对 +1</button>
+            <button class="ghost-btn" id="allPlusTwoBtn" type="button">团队挑战 +2</button>
+            <span class="chip answer-all" id="allChanceText">全员抢答概率 18%</span>
+          </div>
+        </div>
+      </div>
+      <div class="players" id="players"></div>
+    </section>
+
+    <nav class="aux-tabs" aria-label="栏目">
+      <button class="ghost-btn tab-btn active" type="button" data-tab="game">主控台</button>
+      <button class="ghost-btn tab-btn" type="button" data-tab="settings">设置</button>
+      <button class="ghost-btn tab-btn" type="button" data-tab="board">排行</button>
+      <button class="ghost-btn tab-btn" type="button" data-tab="events">事件</button>
+      <button class="ghost-btn tab-btn" type="button" data-tab="manual">说明</button>
+      <button class="ghost-btn tab-btn" type="button" data-tab="easter">彩蛋</button>
+    </nav>
+
+    <section class="panel right-panel">
+      <div class="panel-title">
+        <h2>排行榜与事件</h2>
+        <span class="chip" id="eventCount">0 件事</span>
+      </div>
+      <div class="side-list">
+        <div class="leader-section">
+          <div class="leaderboard" id="leaderboard"></div>
+        </div>
+        <div class="event-log event-section" id="eventLog"></div>
+      </div>
+      <div class="surprise-board">
+        <div class="surprise-card manual-section">
+          <h3>玩法说明书</h3>
+          <div class="manual-grid">
+            <div class="manual-item"><strong>1. 选人答题</strong><span>先转命运转盘。指针指到谁，谁答题；抽到全员抢答时可用课堂辅助奖励。</span></div>
+            <div class="manual-item"><strong>2. 基础得分</strong><span>答对点 +1 或 +2。连续 +2、职业被动、盲盒都会制造额外变化。</span></div>
+            <div class="manual-item"><strong>3. 职业系统</strong><span>每个职业有被动和 3 回合冷却技能。法师爆发，船长地产，美食家拿资源，导演反领先，侦探控概率。</span></div>
+            <div class="manual-item"><strong>4. 宝箱装备</strong><span>答题后可能掉宝箱，最多保留 3 张卡。星愿钥匙加分，护盾挡租，贴纸下次额外 +1，门票向第一名收费，地图提高盲盒概率。</span></div>
+            <div class="manual-item"><strong>5. 公司收租</strong><span>攒到 3 分可开店。其他玩家答题后可能路过并交租，船长收租更强。</span></div>
+          </div>
+        </div>
+        <div class="surprise-card easter-section">
+          <h3>今日隐藏彩蛋</h3>
+          <p id="easterHint">连续给落后的玩家加分，城堡可能会偷偷放烟花。</p>
+          <div class="memory-strip">
+            <div class="memory-thumb" style="background-image:url('assets/memories/memory-sticker-card.png')"><span>漫画贴纸</span></div>
+            <div class="memory-thumb" style="background-image:url('assets/memories/yat-tung-bbq.jpg')"><span>逸东轩烧味</span></div>
+            <div class="memory-thumb" style="background-image:url('assets/memories/yat-tung-dim-sum.jpg')"><span>点心战术</span></div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<div class="modal" id="mysteryModal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+  <div class="modal-card">
+    <div class="modal-top">
+      <h2 id="modalTitle">梦幻盲盒</h2>
+      <button class="close-btn" id="closeModal" type="button" aria-label="关闭">X</button>
+    </div>
+    <div class="box-area">
+      <div class="mystery-box" aria-hidden="true">
+        <div class="lid"></div>
+        <div class="body"></div>
+        <div class="ribbon-v"></div>
+        <div class="ribbon-h"></div>
+      </div>
+      <div class="result" id="boxResult">
+        <h3>准备开盒</h3>
+        <p>点击下方按钮，看看维港夜空下藏着什么惊喜。</p>
+      </div>
+      <button class="primary-btn" id="revealBox" type="button">揭晓惊喜</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const palettes = ["#e45a9d","#37b9ff","#73c66f","#ff9b47","#9d7cff"];
+const defaultNames = ["星愿队","维港队","城堡队","小轮队","叮叮队"];
+const hkHints = [
+  "下一次有人追平第一名时，维港会多放一轮烟花。",
+  "手动盲盒有更高机会抽到全员奖励，适合课堂气氛快冷掉的时候。",
+  "如果某位玩家暂停一回合，下一回合解冻时会有小小回归音效。",
+  "连续三次 +2 可能触发星愿暴击。",
+  "命运转盘抽到全员抢答时，可以让最快举手的人答题，也可以全班齐答。",
+  "普通奖励适合维持节奏，传说和神话奖励会明显改变排行榜。",
+  "攒到 3 分可以开公司，别人答题后可能路过并交租。",
+  "宝箱卡最多保留 3 张，太贪心会挤掉最早的卡。",
+  "极低概率会出现命运彗星，送出卡牌并提高惊喜概率。"
+];
+const memoryAssets = {
+  softServe1:{src:"assets/memories/soft-serve-1.jpg", alt:"王老师和孩子的香港雪糕记忆"},
+  softServe2:{src:"assets/memories/soft-serve-2.jpg", alt:"富豪雪糕车前的双筒雪糕"},
+  drink:{src:"assets/memories/disney-drink.jpg", alt:"香港乐园餐厅饮品"},
+  breakfast:{src:"assets/memories/hk-breakfast.jpg", alt:"香港茶餐厅早餐"},
+  sticker:{src:"assets/memories/memory-sticker-card.png", alt:"香港记忆漫画贴纸"},
+  yatSoup:{src:"assets/memories/yat-tung-soup.jpg", alt:"逸东轩汤品"},
+  yatBbq:{src:"assets/memories/yat-tung-bbq.jpg", alt:"逸东轩烧味双拼"},
+  yatCharSiu:{src:"assets/memories/yat-tung-char-siu.jpg", alt:"逸东轩叉烧"},
+  yatDimSum:{src:"assets/memories/yat-tung-dim-sum.jpg", alt:"逸东轩点心"},
+  yatBbqClose:{src:"assets/memories/yat-tung-bbq-close.jpg", alt:"逸东轩烧味特写"},
+  yatCrispy:{src:"assets/memories/yat-tung-crispy.jpg", alt:"逸东轩脆皮烧味"},
+  yatSeafood:{src:"assets/memories/yat-tung-seafood.jpg", alt:"逸东轩海鲜菜式"}
+};
+const roles = {
+  mage:{icon:"星", name:"星愿法师", skill:"星爆 +2 并掉宝箱", passive:"答对 +2 时有机会额外 +1。", hint:"爆发型，适合强答题手。"},
+  captain:{icon:"船", name:"维港船长", skill:"免费开公司或收租", passive:"收租时租金 +1。", hint:"地产型，越早开公司越有压迫感。"},
+  foodie:{icon:"食", name:"美食家", skill:"美食宝箱 + 补给", passive:"答题后更容易掉宝箱。", hint:"资源型，稳定拿卡和追分。"},
+  director:{icon:"烟", name:"烟花导演", skill:"向第一名收门票", passive:"触发烟花时可能获得卡牌。", hint:"反领先型，适合追击第一名。"},
+  detective:{icon:"时", name:"时间侦探", skill:"预言下一次惊喜", passive:"每次答题微升盲盒概率。", hint:"控概率型，适合赌传说和神话。"}
+};
+const roleOrder = ["mage","captain","foodie","director","detective"];
+const properties = [
+  {key:"castleShop", name:"城堡商店", rent:1},
+  {key:"harborDock", name:"维港码头", rent:1},
+  {key:"iceCreamTruck", name:"雪糕车公司", rent:1},
+  {key:"fireworkStudio", name:"烟花工坊", rent:1},
+  {key:"yatTungTable", name:"逸东轩包间", rent:1}
+];
+const lootCards = {
+  starKey:{name:"星愿钥匙", type:"active", text:"使用后自己 +2。"},
+  shield:{name:"港湾护盾", type:"auto", text:"自动抵挡一次租金。"},
+  doubleCoupon:{name:"双倍贴纸", type:"auto", text:"下次答题额外 +1。"},
+  fireworkTicket:{name:"烟花门票", type:"active", text:"向第一名收 1 分。"},
+  map:{name:"盲盒地图", type:"active", text:"提高惊喜概率并开小烟花。"}
+};
+const rarityMeta = {
+  common:{label:"普通", key:"common", weight:42, fire:1},
+  rare:{label:"稀有", key:"rare", weight:28, fire:2},
+  epic:{label:"史诗", key:"epic", weight:18, fire:4},
+  legend:{label:"传说", key:"legend", weight:9, fire:6},
+  mythic:{label:"神话", key:"mythic", weight:3, fire:8}
+};
+
+let players = [];
+let history = [];
+let eventLog = [];
+let round = 1;
+let soundOn = true;
+let surpriseChance = 0.35;
+let lastBoosts = [];
+let selectedResponderId = null;
+let allAnswerMode = false;
+let forcedResponderId = null;
+let secretFlashId = null;
+let wheelRotation = 0;
+let isSpinning = false;
+let secretTap = {id:null, count:0, time:0};
+let activeAuxTab = "game";
+let audioCtx = null;
+
+const els = {
+  playerCount: document.getElementById("playerCount"),
+  nameGrid: document.getElementById("nameGrid"),
+  players: document.getElementById("players"),
+  leaderboard: document.getElementById("leaderboard"),
+  eventLog: document.getElementById("eventLog"),
+  leaderName: document.getElementById("leaderName"),
+  topScore: document.getElementById("topScore"),
+  chanceText: document.getElementById("chanceText"),
+  eventCount: document.getElementById("eventCount"),
+  roundInfo: document.getElementById("roundInfo"),
+  answerWheel: document.getElementById("answerWheel"),
+  wheelLabels: document.getElementById("wheelLabels"),
+  spinBtn: document.getElementById("spinBtn"),
+  selectedResult: document.getElementById("selectedResult"),
+  clearSelectionBtn: document.getElementById("clearSelectionBtn"),
+  quickUndoBtn: document.getElementById("quickUndoBtn"),
+  allPlusOneBtn: document.getElementById("allPlusOneBtn"),
+  allPlusTwoBtn: document.getElementById("allPlusTwoBtn"),
+  allChanceText: document.getElementById("allChanceText"),
+  applyNames: document.getElementById("applyNames"),
+  resetBtn: document.getElementById("resetBtn"),
+  undoBtn: document.getElementById("undoBtn"),
+  soundBtn: document.getElementById("soundBtn"),
+  mysteryBtn: document.getElementById("mysteryBtn"),
+  modal: document.getElementById("mysteryModal"),
+  closeModal: document.getElementById("closeModal"),
+  revealBox: document.getElementById("revealBox"),
+  boxResult: document.getElementById("boxResult"),
+  toast: document.getElementById("toast"),
+  confetti: document.getElementById("confetti"),
+  easterHint: document.getElementById("easterHint"),
+  tabButtons: [...document.querySelectorAll(".tab-btn")]
+};
+
+function saveState(){
+  localStorage.setItem("castleClassroomScoreboard", JSON.stringify({
+    players, eventLog, round, soundOn, surpriseChance, selectedResponderId, allAnswerMode, forcedResponderId, wheelRotation
+  }));
+}
+
+function loadState(){
+  const raw = localStorage.getItem("castleClassroomScoreboard");
+  if (!raw) return false;
+  try{
+    const saved = JSON.parse(raw);
+    players = saved.players || [];
+    eventLog = saved.eventLog || [];
+    round = saved.round || 1;
+    soundOn = saved.soundOn !== false;
+    surpriseChance = saved.surpriseChance || 0.35;
+    selectedResponderId = saved.selectedResponderId || null;
+    allAnswerMode = saved.allAnswerMode || false;
+    forcedResponderId = saved.forcedResponderId || null;
+    wheelRotation = saved.wheelRotation || 0;
+    normalizePlayers();
+    return players.length >= 2;
+  }catch(err){
+    return false;
+  }
+}
+
+function createPlayers(count){
+  players = Array.from({length: count}, (_, index) => ({
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + index),
+    name: defaultNames[index],
+    score: 0,
+    color: palettes[index],
+    frozen: false,
+    streak: 0,
+    role: roleOrder[index % roleOrder.length],
+    skillUsed: false,
+    skillCooldown: 0,
+    inventory: [],
+    property: null
+  }));
+  eventLog = [];
+  history = [];
+  round = 1;
+  surpriseChance = 0.35;
+  selectedResponderId = null;
+  allAnswerMode = false;
+  forcedResponderId = null;
+  wheelRotation = 0;
+}
+
+function syncNameInputs(){
+  normalizePlayers();
+  els.nameGrid.innerHTML = "";
+  players.forEach((player, index) => {
+    const row = document.createElement("div");
+    row.className = "name-row";
+    row.innerHTML = `
+      <div class="token" style="background:${player.color}">${index + 1}</div>
+      <input aria-label="玩家 ${index + 1} 名字" value="${escapeHtml(player.name)}" maxlength="12">
+      <select class="role-select" aria-label="玩家 ${index + 1} 职业">
+        ${roleOrder.map(roleKey => `<option value="${roleKey}" ${player.role === roleKey ? "selected" : ""}>${roles[roleKey].icon} ${roles[roleKey].name}｜${roles[roleKey].skill}</option>`).join("")}
+      </select>
+    `;
+    els.nameGrid.appendChild(row);
+  });
+  els.playerCount.value = String(players.length);
+}
+
+function normalizePlayers(){
+  players.forEach((player, index) => {
+    if (!player.role || !roles[player.role]) player.role = roleOrder[index % roleOrder.length];
+    if (typeof player.skillCooldown !== "number" || player.skillCooldown > 20) player.skillCooldown = 0;
+    if (typeof player.skillUsed !== "boolean") player.skillUsed = player.skillCooldown > 0;
+    if (typeof player.streak !== "number") player.streak = 0;
+    if (!Array.isArray(player.inventory)) player.inventory = [];
+    if (typeof player.property === "undefined") player.property = null;
+  });
+}
+
+function escapeHtml(value){
+  return String(value).replace(/[&<>"']/g, char => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"
+  }[char]));
+}
+
+function renderEventArt(event){
+  if (!event.art) return "";
+  const stickerClass = event.art.src.includes("sticker") ? " sticker" : "";
+  return `<img class="result-art${stickerClass}" src="${escapeHtml(event.art.src)}" alt="${escapeHtml(event.art.alt)}">`;
+}
+
+function setAuxTab(tab){
+  activeAuxTab = tab;
+  document.body.dataset.auxTab = tab;
+  els.tabButtons.forEach(button => {
+    button.classList.toggle("active", button.dataset.tab === tab);
+  });
+}
+
+function snapshot(){
+  history.push(JSON.stringify({players, eventLog, round, surpriseChance, lastBoosts, selectedResponderId, allAnswerMode, forcedResponderId, wheelRotation}));
+  if (history.length > 25) history.shift();
+}
+
+function restoreSnapshot(){
+  const raw = history.pop();
+  if (!raw){
+    showToast("还没有可以撤回的操作。");
+    return;
+  }
+  const state = JSON.parse(raw);
+  players = state.players;
+  eventLog = state.eventLog;
+  round = state.round;
+  surpriseChance = state.surpriseChance;
+  lastBoosts = state.lastBoosts || [];
+  selectedResponderId = state.selectedResponderId || null;
+  allAnswerMode = state.allAnswerMode || false;
+  forcedResponderId = state.forcedResponderId || null;
+  wheelRotation = state.wheelRotation || 0;
+  secretFlashId = null;
+  secretTap = {id:null, count:0, time:0};
+  render();
+  saveState();
+  showToast("已撤回上一步。");
+}
+
+function addScore(id, amount){
+  const player = players.find(item => item.id === id);
+  if (!player) return;
+  if (player.frozen){
+    snapshot();
+    player.frozen = false;
+    pushEvent(`${player.name} 刚刚解除暂停，这一轮先回到舞台中央。`);
+    playTone("soft");
+    render();
+    saveState();
+    return;
+  }
+  snapshot();
+  const finalAmount = applyScoreModifiers(player, amount);
+  player.score += finalAmount;
+  player.streak = amount === 2 ? player.streak + 1 : 0;
+  lastBoosts.push({id, amount});
+  if (lastBoosts.length > 5) lastBoosts.shift();
+  pushEvent(`${player.name} 获得 +${finalAmount} 分，城堡灯光亮起。`);
+  playTone(amount === 2 ? "big" : "score");
+  sparkleCard(id);
+  burstConfetti(amount === 2 ? 18 : 10);
+  applyRolePassiveOnScore(player, amount);
+  if (player.streak >= 3){
+    player.streak = 0;
+    player.score += 2;
+    pushEvent(`${player.name} 连续三次 +2，触发星愿暴击，额外 +2。`);
+    launchFireworks(4);
+    playTone("fanfare");
+  }
+  maybeDropChest(player, amount);
+  maybeRentVisit(player);
+  maybeSurprise(player);
+  maybeCometEvent(player);
+  advanceRound();
+  render();
+  saveState();
+}
+
+function applyScoreModifiers(player, amount){
+  let finalAmount = amount;
+  const couponIndex = player.inventory.indexOf("doubleCoupon");
+  if (couponIndex >= 0){
+    player.inventory.splice(couponIndex, 1);
+    finalAmount += 1;
+    pushEvent(`${player.name} 自动使用 <strong>${lootCards.doubleCoupon.name}</strong>，本次额外 +1。`);
+  }
+  return finalAmount;
+}
+
+function applyRolePassiveOnScore(player, amount){
+  if (player.role === "mage" && amount === 2 && Math.random() < 0.35){
+    player.score += 1;
+    pushEvent(`<strong>星愿法师被动</strong>｜${player.name} 触发星光连击，额外 +1。`);
+    launchFireworks(1);
+  }
+  if (player.role === "director" && amount === 2 && Math.random() < 0.25){
+    addLootCard(player, "fireworkTicket");
+    pushEvent(`<strong>烟花导演被动</strong>｜${player.name} 获得一张烟花门票卡。`);
+  }
+  if (player.role === "detective"){
+    surpriseChance = Math.min(0.82, surpriseChance + 0.05);
+  }
+}
+
+function maybeDropChest(player, amount){
+  let chance = 0.22 + (amount === 2 ? 0.08 : 0);
+  if (player.role === "foodie") chance += 0.14;
+  if (Math.random() >= chance) return;
+  const cardKey = drawLootCard(player);
+  addLootCard(player, cardKey);
+  pushEvent(`<strong>宝箱掉落</strong>｜${player.name} 获得 ${lootCards[cardKey].name}。`);
+  showToast(`${player.name} 掉出宝箱：${lootCards[cardKey].name}`);
+  burstConfetti(22);
+  playTone("mystery");
+}
+
+function drawLootCard(player){
+  const pool = ["starKey","shield","doubleCoupon","fireworkTicket","map"];
+  if (player.role === "captain") pool.push("shield");
+  if (player.role === "foodie") pool.push("doubleCoupon", "map");
+  if (player.role === "director") pool.push("fireworkTicket");
+  if (player.role === "detective") pool.push("map");
+  return pool[Math.floor(Math.random() * pool.length)];
+}
+
+function addLootCard(player, cardKey){
+  if (player.inventory.length >= 3) player.inventory.shift();
+  player.inventory.push(cardKey);
+}
+
+function maybeRentVisit(visitor){
+  const owned = players.filter(player => player.property && player.id !== visitor.id);
+  if (!owned.length || Math.random() >= 0.26) return;
+  const owner = owned[Math.floor(Math.random() * owned.length)];
+  const property = properties.find(item => item.key === owner.property);
+  if (!property) return;
+  let rent = property.rent + (owner.role === "captain" ? 1 : 0);
+  const shieldIndex = visitor.inventory.indexOf("shield");
+  if (shieldIndex >= 0){
+    visitor.inventory.splice(shieldIndex, 1);
+    pushEvent(`<strong>路过${property.name}</strong>｜${visitor.name} 用港湾护盾挡下租金。`);
+    showToast(`${visitor.name} 用护盾挡租金`);
+    return;
+  }
+  const paid = Math.min(rent, Math.max(0, visitor.score));
+  visitor.score -= paid;
+  owner.score += paid;
+  pushEvent(`<strong>收租</strong>｜${visitor.name} 路过 ${owner.name} 的 ${property.name}，支付 ${paid} 分租金。`);
+  showToast(`${owner.name} 收到 ${property.name} 租金 +${paid}`);
+}
+
+function maybeCometEvent(player){
+  if (Math.random() >= 0.07) return;
+  const cardKey = drawLootCard(player);
+  addLootCard(player, cardKey);
+  surpriseChance = Math.min(0.86, surpriseChance + 0.08);
+  pushEvent(`<strong>命运彗星</strong>｜一道彗星划过维港，${player.name} 获得 ${lootCards[cardKey].name}，惊喜概率小幅提高。`);
+  showToast(`命运彗星：${player.name} 获得 ${lootCards[cardKey].name}`);
+  launchFireworks(2);
+}
+
+function advanceRound(){
+  round += 1;
+  players.forEach(player => {
+    if (player.skillCooldown > 0 && player.skillCooldown < 99) player.skillCooldown -= 1;
+    player.skillUsed = player.skillCooldown > 0;
+  });
+}
+
+function maybeSurprise(triggerPlayer){
+  const behind = getBehindPlayers();
+  const isComeback = behind.some(item => item.id === triggerPlayer.id);
+  const chance = Math.min(0.68, surpriseChance + (isComeback ? 0.18 : 0));
+  if (Math.random() < chance){
+    const event = pickMystery(triggerPlayer);
+    applyMystery(event);
+    surpriseChance = 0.28;
+  }else{
+    surpriseChance = Math.min(0.68, surpriseChance + 0.06);
+  }
+}
+
+function getBehindPlayers(){
+  const max = Math.max(...players.map(player => player.score));
+  return players.filter(player => player.score < max);
+}
+
+function pickMystery(triggerPlayer){
+  const target = triggerPlayer || players[Math.floor(Math.random() * players.length)];
+  const others = players.filter(player => player.id !== target.id);
+  const randomOther = others[Math.floor(Math.random() * others.length)] || target;
+  const lowScore = [...players].sort((a,b) => a.score - b.score)[0];
+  const leader = [...players].sort((a,b) => b.score - a.score)[0];
+  const events = [
+    {
+      rarityKey:"common",
+      title:"圆耳形状云朵",
+      text:`${target.name} 抬头看到幸运云朵，额外 +1。`,
+      run:() => target.score += 1
+    },
+    {
+      rarityKey:"common",
+      title:"菠萝包能量",
+      text:`${target.name} 补充课堂能量，额外 +1。`,
+      run:() => target.score += 1
+    },
+    {
+      rarityKey:"common",
+      title:"王老师的乐园饮品",
+      text:`翻到王老师的乐园饮品照片，${target.name} 获得清醒能量 +1。`,
+      art:memoryAssets.drink,
+      run:() => target.score += 1
+    },
+    {
+      rarityKey:"common",
+      title:"巡游掌声",
+      text:`全班给 ${target.name} 鼓掌，${target.name} +1。`,
+      run:() => target.score += 1
+    },
+    {
+      rarityKey:"rare",
+      title:"天星小轮同行票",
+      text:`全员一起上船，每位玩家 +1。`,
+      run:() => players.forEach(player => player.score += 1)
+    },
+    {
+      rarityKey:"rare",
+      title:"点心蒸笼加餐",
+      text:`当前最低分的 ${lowScore.name} 打开点心蒸笼，+2 追赶。`,
+      run:() => lowScore.score += 2
+    },
+    {
+      rarityKey:"rare",
+      title:"富豪雪糕碰杯",
+      text:`王老师和孩子的雪糕记忆出现了，${target.name} 甜蜜加速 +2。`,
+      art:memoryAssets.softServe1,
+      run:() => target.score += 2
+    },
+    {
+      rarityKey:"rare",
+      title:"城堡快速通行证",
+      text:`${target.name} 拿到快速通行证，立即 +2。`,
+      run:() => target.score += 2
+    },
+    {
+      rarityKey:"rare",
+      title:"逸东轩金汤补给",
+      text:`王老师的逸东轩美食相册翻开，${target.name} 获得 +2。`,
+      art:memoryAssets.yatSoup,
+      run:() => target.score += 2
+    },
+    {
+      rarityKey:"rare",
+      title:"脆皮灵感一口",
+      text:`逸东轩脆皮烧味带来灵感，${target.name} +1，下一次惊喜概率提高。`,
+      art:memoryAssets.yatCrispy,
+      run:() => {
+        target.score += 1;
+        surpriseChance = Math.min(0.78, surpriseChance + 0.12);
+      }
+    },
+    {
+      rarityKey:"epic",
+      title:"叮叮车急转弯",
+      text:`${target.name} 和 ${randomOther.name} 交换分数，排行榜重新洗牌。`,
+      run:() => {
+        const score = target.score;
+        target.score = randomOther.score;
+        randomOther.score = score;
+      }
+    },
+    {
+      rarityKey:"epic",
+      title:"狮子山勇气星",
+      text:`${lowScore.name} 获得勇气星，直接追到倒数第二名附近。`,
+      run:() => {
+        const sorted = [...players].sort((a,b) => a.score - b.score);
+        const nextScore = sorted[1] ? sorted[1].score : lowScore.score;
+        lowScore.score = Math.max(lowScore.score + 1, nextScore);
+      }
+    },
+    {
+      rarityKey:"epic",
+      title:"烟花暂停键",
+      text:`${leader.name} 站上烟花舞台，暂停一回合，给大家追赶机会。`,
+      run:() => leader.frozen = true
+    },
+    {
+      rarityKey:"epic",
+      title:"港式早餐补给站",
+      text:`茶餐厅早餐彩蛋登场，最低分的 ${lowScore.name} +3。`,
+      art:memoryAssets.breakfast,
+      run:() => lowScore.score += 3
+    },
+    {
+      rarityKey:"epic",
+      title:"逸东轩点心战术盘",
+      text:`点心上桌，最低分的 ${lowScore.name} +2，${target.name} +1。`,
+      art:memoryAssets.yatDimSum,
+      run:() => {
+        lowScore.score += 2;
+        target.score += 1;
+      }
+    },
+    {
+      rarityKey:"epic",
+      title:"叉烧能量切片",
+      text:`叉烧能量切片登场，${target.name} +2，并清除自己的暂停状态。`,
+      art:memoryAssets.yatCharSiu,
+      run:() => {
+        target.score += 2;
+        target.frozen = false;
+      }
+    },
+    {
+      rarityKey:"legend",
+      title:"维港烟花秀",
+      text:`${target.name} 的答案点亮夜空，额外 +3。`,
+      run:() => target.score += 3
+    },
+    {
+      rarityKey:"legend",
+      title:"巡游压轴彩车",
+      text:`${target.name} 带领巡游，全员 +1，自己再 +1。`,
+      run:() => {
+        players.forEach(player => player.score += 1);
+        target.score += 1;
+      }
+    },
+    {
+      rarityKey:"legend",
+      title:"王老师父子隐藏相册",
+      text:`真实香港旅程变成隐藏相册，所有玩家 +1，${target.name} 再 +2。`,
+      art:memoryAssets.softServe2,
+      run:() => {
+        players.forEach(player => player.score += 1);
+        target.score += 2;
+      }
+    },
+    {
+      rarityKey:"legend",
+      title:"逸东轩烧味名场面",
+      text:`烧味名场面登场，${target.name} +3，并解除暂停状态。`,
+      art:memoryAssets.yatBbq,
+      run:() => {
+        target.score += 3;
+        target.frozen = false;
+      }
+    },
+    {
+      rarityKey:"legend",
+      title:"烧味特写暴击",
+      text:`烧味特写触发暴击，${target.name} +2，最低分的 ${lowScore.name} +2。`,
+      art:memoryAssets.yatBbqClose,
+      run:() => {
+        target.score += 2;
+        lowScore.score += 2;
+      }
+    },
+    {
+      rarityKey:"mythic",
+      title:"星愿城堡奇迹",
+      text:`全场星光爆发，最低分玩家 +4，其余玩家 +1。`,
+      run:() => {
+        players.forEach(player => player.score += player.id === lowScore.id ? 4 : 1);
+      }
+    },
+    {
+      rarityKey:"mythic",
+      title:"隐藏烟花密码",
+      text:`${target.name} 找到隐藏密码，分数翻倍后再 +1。`,
+      art:memoryAssets.sticker,
+      run:() => target.score = target.score * 2 + 1
+    },
+    {
+      rarityKey:"mythic",
+      title:"逸东轩终极宴会",
+      text:`终极宴会开席，全员 +2，最低分玩家额外 +2。`,
+      art:memoryAssets.yatSeafood,
+      run:() => {
+        players.forEach(player => player.score += 2);
+        lowScore.score += 2;
+      }
+    }
+  ];
+  return pickWeightedEvent(events);
+}
+
+function pickWeightedEvent(events){
+  const weighted = events.map(event => ({
+    ...event,
+    rarity: rarityMeta[event.rarityKey] || rarityMeta.common
+  }));
+  const total = weighted.reduce((sum, event) => sum + event.rarity.weight, 0);
+  let roll = Math.random() * total;
+  for (const event of weighted){
+    roll -= event.rarity.weight;
+    if (roll <= 0) return event;
+  }
+  return weighted[0];
+}
+
+function applyMystery(event){
+  event.run();
+  pushEvent(`<strong>${event.title}</strong>｜${event.rarity.label}：${event.text}`);
+  showToast(`${event.title}：${event.text.replace(/<[^>]*>/g, "")}`);
+  launchFireworks(event.rarity.fire || 2);
+  if (event.rarity.key === "legend" || event.rarity.key === "mythic"){
+    players.filter(player => player.role === "director").forEach(player => {
+      if (Math.random() < 0.5){
+        addLootCard(player, "fireworkTicket");
+        pushEvent(`<strong>烟花导演被动</strong>｜${player.name} 从大型烟花中获得一张烟花门票卡。`);
+      }
+    });
+  }
+  burstConfetti(event.rarity.key === "mythic" ? 70 : event.rarity.key === "legend" ? 52 : 30);
+  playTone(event.rarity.key === "mythic" || event.rarity.key === "legend" ? "fanfare" : "mystery");
+}
+
+function pushEvent(message){
+  eventLog.unshift({message, time: new Date().toLocaleTimeString("zh-CN", {hour:"2-digit", minute:"2-digit"})});
+  if (eventLog.length > 40) eventLog.pop();
+}
+
+function render(){
+  normalizePlayers();
+  if (selectedResponderId && !players.some(player => player.id === selectedResponderId)){
+    selectedResponderId = null;
+  }
+  if (forcedResponderId && !players.some(player => player.id === forcedResponderId)){
+    forcedResponderId = null;
+  }
+  const sorted = [...players].sort((a,b) => b.score - a.score);
+  const leader = sorted[0];
+  const topScore = leader ? leader.score : 0;
+  els.leaderName.textContent = leader ? leader.name : "准备中";
+  els.topScore.textContent = String(topScore);
+  els.chanceText.textContent = `${Math.round(surpriseChance * 100)}%`;
+  els.eventCount.textContent = `${eventLog.length} 件事`;
+  els.roundInfo.textContent = `第 ${round} 回合`;
+  els.soundBtn.textContent = `声音：${soundOn ? "开" : "关"}`;
+  els.easterHint.textContent = hkHints[round % hkHints.length];
+  const selected = players.find(player => player.id === selectedResponderId);
+  els.selectedResult.innerHTML = allAnswerMode
+    ? `全员抢答！<span class="answer-all">所有玩家都有机会答题。</span>`
+    : selected
+      ? `本题答题者：<span style="color:${selected.color}">${escapeHtml(selected.name)}</span>`
+      : "还没有选中答题者。";
+  els.spinBtn.disabled = isSpinning;
+  els.spinBtn.textContent = isSpinning ? "转盘旋转中..." : "命运转盘：选答题者";
+  renderWheelLabels();
+
+  els.players.innerHTML = "";
+  players.forEach(player => {
+    const rank = sorted.findIndex(item => item.id === player.id) + 1;
+    const role = roles[player.role] || roles.mage;
+    const property = properties.find(item => item.key === player.property);
+    const inventoryText = player.inventory.length
+      ? player.inventory.map(cardKey => lootCards[cardKey]?.name || "神秘卡").join(" / ")
+      : "暂无卡牌";
+    const skillText = player.skillCooldown > 0
+      ? `冷却 ${player.skillCooldown}`
+      : role.skill;
+    const card = document.createElement("article");
+    card.className = `player-card ${rank === 1 ? "leader" : ""} ${player.frozen ? "frozen" : ""} ${selectedResponderId === player.id ? "selected" : ""} ${allAnswerMode ? "all-answer" : ""} ${secretFlashId === player.id ? "secret-flash" : ""}`;
+    card.style.setProperty("--player-color", player.color);
+    card.dataset.playerId = player.id;
+    card.innerHTML = `
+      <div class="player-head">
+        <div style="display:flex;align-items:center;gap:8px;min-width:0">
+          <div class="badge">${rank}</div>
+          <h3 class="player-name" data-secret-id="${player.id}">${escapeHtml(player.name)}</h3>
+        </div>
+        <div class="rank">第 ${rank}</div>
+      </div>
+      <div class="role-line">
+        <div class="role-pill" title="${escapeHtml(role.hint)}">${escapeHtml(role.icon)} ${escapeHtml(role.name)}</div>
+        <div class="skill-state">${escapeHtml(skillText)}</div>
+      </div>
+      <div class="asset-line"><span class="mini-tag">${property ? `公司：${property.name}` : "未开公司"}</span></div>
+      <div class="inventory-line"><span class="mini-tag">卡：${escapeHtml(inventoryText)}</span></div>
+      <div>
+        <div class="score">${player.score}</div>
+        <div class="score-label">magic points</div>
+      </div>
+      <div class="score-actions">
+        <button type="button" data-id="${player.id}" data-score="1">+1</button>
+        <button type="button" data-id="${player.id}" data-score="2">+2</button>
+        <button class="skill-btn" type="button" data-skill-id="${player.id}" ${player.skillCooldown > 0 ? "disabled" : ""}>技能</button>
+        <button class="company-btn" type="button" data-company-id="${player.id}" ${player.property || player.score < 3 ? "disabled" : ""}>开店</button>
+        <button class="card-btn" type="button" data-card-id="${player.id}" ${hasUsableCard(player) ? "" : "disabled"}>卡牌</button>
+      </div>
+    `;
+    els.players.appendChild(card);
+  });
+
+  els.leaderboard.innerHTML = "";
+  sorted.forEach((player, index) => {
+    const row = document.createElement("div");
+    row.className = "leader-row";
+    row.innerHTML = `<span>${index + 1}</span><span>${escapeHtml(player.name)}</span><strong>${player.score}</strong>`;
+    els.leaderboard.appendChild(row);
+  });
+
+  els.eventLog.innerHTML = eventLog.length ? "" : `<div class="event">还没有事件。第一位加分的玩家会点亮城堡。</div>`;
+  eventLog.forEach(event => {
+    const item = document.createElement("div");
+    item.className = "event";
+    item.innerHTML = `<strong>${event.time}</strong> ${event.message}`;
+    els.eventLog.appendChild(item);
+  });
+}
+
+function renderWheelLabels(){
+  const choices = getWheelChoices();
+  const segment = 360 / choices.length;
+  const stops = choices.map((choice, index) => {
+    const start = index * segment;
+    const end = (index + 1) * segment;
+    return `${choice.color} ${start}deg ${end}deg`;
+  }).join(", ");
+  els.answerWheel.style.background = `conic-gradient(${stops})`;
+  els.answerWheel.style.transform = `rotate(${wheelRotation}deg)`;
+  els.wheelLabels.style.transform = `rotate(${wheelRotation}deg)`;
+  els.wheelLabels.innerHTML = "";
+  choices.forEach((choice, index) => {
+    const label = document.createElement("div");
+    label.className = "wheel-label";
+    label.style.setProperty("--angle", `${index * segment + segment / 2}deg`);
+    label.textContent = choice.shortName;
+    els.wheelLabels.appendChild(label);
+  });
+}
+
+function getWheelChoices(){
+  return [
+    ...players.map(player => ({
+      type:"player",
+      id:player.id,
+      name:player.name,
+      shortName:player.name,
+      color:player.color
+    })),
+    {
+      type:"all",
+      id:"all",
+      name:"全员抢答",
+      shortName:"全员",
+      color:"#ffd36b"
+    }
+  ];
+}
+
+function spinResponderWheel(){
+  if (isSpinning) return;
+  snapshot();
+  isSpinning = true;
+  render();
+  const choices = getWheelChoices();
+  const allIndex = choices.findIndex(choice => choice.type === "all");
+  let selectedIndex = forcedResponderId
+    ? choices.findIndex(choice => choice.id === forcedResponderId)
+    : Math.floor(Math.random() * players.length);
+  if (selectedIndex < 0) selectedIndex = Math.floor(Math.random() * players.length);
+  if (!forcedResponderId && Math.random() < 0.18 && allIndex >= 0) selectedIndex = allIndex;
+  const segment = 360 / choices.length;
+  const targetAngle = selectedIndex * segment + segment / 2;
+  const current = ((wheelRotation % 360) + 360) % 360;
+  const delta = (360 - ((current + targetAngle) % 360)) % 360;
+  wheelRotation += 1440 + delta;
+  els.answerWheel.style.transform = `rotate(${wheelRotation}deg)`;
+  els.wheelLabels.style.transform = `rotate(${wheelRotation}deg)`;
+  playTone("spin");
+  setTimeout(() => {
+    const choice = choices[selectedIndex];
+    isSpinning = false;
+    allAnswerMode = choice.type === "all";
+    selectedResponderId = allAnswerMode ? null : choice.id;
+    const wasForced = forcedResponderId && choice.id === forcedResponderId;
+    if (wasForced) forcedResponderId = null;
+    if (allAnswerMode){
+      pushEvent("<strong>命运转盘</strong>｜全员抢答：所有玩家都有机会答题。");
+      showToast("命运转盘：全员抢答！");
+      launchFireworks(3);
+      burstConfetti(36);
+      playTone("fanfare");
+    }else{
+      pushEvent(`<strong>命运转盘</strong>｜${choice.name} 获得本题答题机会${wasForced ? "。" : "。"}`);
+      showToast(`命运转盘选中：${choice.name}`);
+      sparkleCard(choice.id);
+      playTone("big");
+    }
+    render();
+    saveState();
+  }, 3300);
+}
+
+function clearSelection(){
+  snapshot();
+  selectedResponderId = null;
+  allAnswerMode = false;
+  pushEvent("答题者选择已清除，下一题可以重新转盘。");
+  render();
+  saveState();
+}
+
+function handleSecretNameTap(id){
+  const now = Date.now();
+  if (secretTap.id !== id || now - secretTap.time > 1100){
+    secretTap = {id, count:1, time:now};
+    return;
+  }
+  secretTap.count += 1;
+  secretTap.time = now;
+  if (secretTap.count < 3) return;
+  snapshot();
+  forcedResponderId = id;
+  secretFlashId = id;
+  secretTap = {id:null, count:0, time:0};
+  render();
+  saveState();
+  setTimeout(() => {
+    if (secretFlashId !== id) return;
+    secretFlashId = null;
+    render();
+  }, 520);
+}
+
+function awardAll(amount){
+  snapshot();
+  players.forEach(player => player.score += amount);
+  pushEvent(`<strong>全员抢答</strong>｜这是课堂辅助奖励，不是个人策略技能。每位玩家 +${amount}。`);
+  launchFireworks(amount === 2 ? 4 : 2);
+  burstConfetti(amount === 2 ? 42 : 24);
+  playTone(amount === 2 ? "fanfare" : "big");
+  advanceRound();
+  render();
+  saveState();
+}
+
+function useRoleSkill(id){
+  const player = players.find(item => item.id === id);
+  if (!player || player.skillCooldown > 0) return;
+  snapshot();
+  const role = roles[player.role] || roles.mage;
+  const lowScore = [...players].sort((a,b) => a.score - b.score)[0];
+  const leader = [...players].sort((a,b) => b.score - a.score)[0];
+  let message = "";
+  let art = null;
+  if (player.role === "mage"){
+    player.score += 2;
+    addLootCard(player, drawLootCard(player));
+    message = `${player.name} 使用星愿法师技能，自己 +2，并获得一个宝箱奖励。`;
+    launchFireworks(2);
+  }else if (player.role === "captain"){
+    if (!player.property){
+      openCompanyFor(player, true);
+      message = `${player.name} 使用维港船长技能，免费开了一家公司。`;
+    }else{
+      const paid = collectFromLeader(player, 1);
+      message = `${player.name} 使用维港船长技能，向第一名收取 ${paid} 分航线费。`;
+    }
+  }else if (player.role === "foodie"){
+    player.score += 1;
+    lowScore.score += 1;
+    addLootCard(player, drawLootCard(player));
+    art = memoryAssets.yatCharSiu;
+    message = `${player.name} 使用美食家技能，自己 +1，最低分的 ${lowScore.name} +1，并获得美食宝箱。`;
+  }else if (player.role === "director"){
+    const paid = collectFromLeader(player, 2);
+    addLootCard(player, "fireworkTicket");
+    message = `${player.name} 使用烟花导演技能，向第一名收取 ${paid} 分门票，并获得烟花门票卡。`;
+    launchFireworks(4);
+    burstConfetti(38);
+  }else if (player.role === "detective"){
+    player.score += 1;
+    surpriseChance = Math.min(0.9, surpriseChance + 0.35);
+    addLootCard(player, "map");
+    message = `${player.name} 使用时间侦探技能，自己 +1，获得盲盒地图，并大幅提高下一次惊喜概率。`;
+  }else{
+    player.score += 1;
+    message = `${player.name} 使用职业技能，自己 +1。`;
+  }
+  player.skillCooldown = 3;
+  player.skillUsed = true;
+  pushEvent(`<strong>${role.name}</strong>｜${message}`);
+  showToast(message);
+  if (art) showSkillArt(role, message, art);
+  playTone(player.role === "director" ? "fanfare" : "mystery");
+  render();
+  saveState();
+}
+
+function collectFromLeader(player, amount){
+  const leader = [...players].sort((a,b) => b.score - a.score)[0];
+  if (!leader || leader.id === player.id) return 0;
+  const paid = Math.min(amount, Math.max(0, leader.score));
+  leader.score -= paid;
+  player.score += paid;
+  return paid;
+}
+
+function openCompany(id){
+  const player = players.find(item => item.id === id);
+  if (!player || player.property || player.score < 3) return;
+  snapshot();
+  player.score -= 3;
+  const property = openCompanyFor(player, false);
+  pushEvent(`<strong>开公司</strong>｜${player.name} 花费 3 分开设 ${property.name}，之后别人路过可能要交租。`);
+  showToast(`${player.name} 开设 ${property.name}`);
+  playTone("mystery");
+  render();
+  saveState();
+}
+
+function openCompanyFor(player, free){
+  const ownedKeys = new Set(players.map(item => item.property).filter(Boolean));
+  const property = properties.find(item => !ownedKeys.has(item.key)) || properties[Math.floor(Math.random() * properties.length)];
+  player.property = property.key;
+  if (!free) player.skillUsed = player.skillCooldown > 0;
+  return property;
+}
+
+function hasUsableCard(player){
+  return player.inventory.some(cardKey => lootCards[cardKey] && lootCards[cardKey].type === "active");
+}
+
+function useCard(id){
+  const player = players.find(item => item.id === id);
+  if (!player) return;
+  const cardIndex = player.inventory.findIndex(cardKey => lootCards[cardKey] && lootCards[cardKey].type === "active");
+  if (cardIndex < 0) return;
+  snapshot();
+  const cardKey = player.inventory.splice(cardIndex, 1)[0];
+  const card = lootCards[cardKey];
+  let message = "";
+  if (cardKey === "starKey"){
+    player.score += 2;
+    message = `${player.name} 使用 ${card.name}，自己 +2。`;
+    launchFireworks(2);
+  }else if (cardKey === "fireworkTicket"){
+    const paid = collectFromLeader(player, 1);
+    message = `${player.name} 使用 ${card.name}，向第一名收取 ${paid} 分。`;
+    launchFireworks(2);
+  }else if (cardKey === "map"){
+    surpriseChance = Math.min(0.9, surpriseChance + 0.3);
+    message = `${player.name} 使用 ${card.name}，下一次惊喜概率大幅提高。`;
+    launchFireworks(1);
+  }else{
+    player.score += 1;
+    message = `${player.name} 使用 ${card.name}，自己 +1。`;
+  }
+  pushEvent(`<strong>技能卡</strong>｜${message}`);
+  showToast(message);
+  playTone("mystery");
+  render();
+  saveState();
+}
+
+function showSkillArt(role, message, art){
+  els.modal.classList.add("open", "revealed");
+  els.boxResult.className = "result epic";
+  els.boxResult.innerHTML = `${renderEventArt({art})}<div class="rarity-badge">职业技能</div><h3>${escapeHtml(role.name)}</h3><p>${escapeHtml(message)}</p>`;
+  els.revealBox.disabled = true;
+}
+
+function sparkleCard(id){
+  const card = document.querySelector(`[data-player-id="${id}"]`);
+  if (!card) return;
+  card.animate([
+    {transform:"translateY(0) scale(1)"},
+    {transform:"translateY(-7px) scale(1.025)"},
+    {transform:"translateY(0) scale(1)"}
+  ], {duration:360, easing:"ease-out"});
+}
+
+function showToast(message){
+  els.toast.textContent = message;
+  els.toast.classList.add("show");
+  clearTimeout(showToast.timer);
+  showToast.timer = setTimeout(() => els.toast.classList.remove("show"), 2600);
+}
+
+function burstConfetti(count){
+  const colors = ["#ffd36b","#e45a9d","#78d7ff","#73f5c3","#ff8a71","#ffffff"];
+  for (let index = 0; index < count; index++){
+    const piece = document.createElement("div");
+    piece.className = "confetti";
+    piece.style.left = `${Math.random() * 100}%`;
+    piece.style.top = `${-20 - Math.random() * 80}px`;
+    piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+    piece.style.animationDuration = `${900 + Math.random() * 900}ms`;
+    piece.style.transform = `rotate(${Math.random() * 180}deg)`;
+    els.confetti.appendChild(piece);
+    setTimeout(() => piece.remove(), 1900);
+  }
+}
+
+function initAudio(){
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+}
+
+function playTone(type){
+  if (!soundOn) return;
+  initAudio();
+  const now = audioCtx.currentTime;
+  const notes = {
+    score:[523,659],
+    big:[523,784,1046],
+    soft:[392,523],
+    spin:[330,392,494,587],
+    mystery:[659,880,1174,1568],
+    fanfare:[523,659,784,1046,1318]
+  }[type] || [523];
+  notes.forEach((freq, index) => {
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = index % 2 ? "triangle" : "sine";
+    osc.frequency.setValueAtTime(freq, now + index * .07);
+    gain.gain.setValueAtTime(0, now + index * .07);
+    gain.gain.linearRampToValueAtTime(.13, now + index * .07 + .018);
+    gain.gain.exponentialRampToValueAtTime(.001, now + index * .07 + .22);
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start(now + index * .07);
+    osc.stop(now + index * .07 + .24);
+  });
+}
+
+const canvas = document.getElementById("fireworks");
+const ctx = canvas.getContext("2d");
+let sparks = [];
+
+function resizeCanvas(){
+  canvas.width = window.innerWidth * devicePixelRatio;
+  canvas.height = window.innerHeight * devicePixelRatio;
+  ctx.setTransform(devicePixelRatio, 0, 0, devicePixelRatio, 0, 0);
+}
+
+function launchFireworks(count){
+  for (let i = 0; i < count; i++){
+    setTimeout(() => {
+      const x = window.innerWidth * (.18 + Math.random() * .64);
+      const y = window.innerHeight * (.15 + Math.random() * .32);
+      const color = ["#ffd36b","#e45a9d","#78d7ff","#73f5c3","#ffffff"][Math.floor(Math.random() * 5)];
+      for (let j = 0; j < 54; j++){
+        const angle = Math.PI * 2 * (j / 54);
+        const speed = 1.2 + Math.random() * 4.2;
+        sparks.push({
+          x, y,
+          vx: Math.cos(angle) * speed,
+          vy: Math.sin(angle) * speed,
+          life: 54 + Math.random() * 26,
+          color
+        });
+      }
+    }, i * 220);
+  }
+}
+
+function animateFireworks(){
+  ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+  sparks = sparks.filter(spark => spark.life > 0);
+  sparks.forEach(spark => {
+    spark.x += spark.vx;
+    spark.y += spark.vy;
+    spark.vy += .035;
+    spark.life -= 1;
+    ctx.globalAlpha = Math.max(0, spark.life / 70);
+    ctx.fillStyle = spark.color;
+    ctx.beginPath();
+    ctx.arc(spark.x, spark.y, 2.1, 0, Math.PI * 2);
+    ctx.fill();
+  });
+  ctx.globalAlpha = 1;
+  requestAnimationFrame(animateFireworks);
+}
+
+function openModal(autoEvent){
+  els.modal.classList.add("open");
+  els.modal.classList.remove("revealed");
+  els.boxResult.className = "result";
+  els.boxResult.innerHTML = `<h3>准备开盒</h3><p>点击下方按钮，看看维港夜空下藏着什么惊喜。</p>`;
+  els.revealBox.disabled = false;
+  els.revealBox.dataset.autoEvent = autoEvent ? "1" : "";
+}
+
+function revealManualBox(){
+  snapshot();
+  const event = pickMystery();
+  els.modal.classList.add("revealed");
+  els.boxResult.className = `result ${event.rarity.key}`;
+  els.boxResult.innerHTML = `${renderEventArt(event)}<div class="rarity-badge">${escapeHtml(event.rarity.label)}</div><h3>${escapeHtml(event.title)}</h3><p>${escapeHtml(event.text)}</p>`;
+  els.revealBox.disabled = true;
+  applyMystery(event);
+  surpriseChance = 0.35;
+  render();
+  saveState();
+}
+
+function applyNames(){
+  const inputs = [...els.nameGrid.querySelectorAll("input")];
+  const roleSelects = [...els.nameGrid.querySelectorAll("select")];
+  snapshot();
+  players.forEach((player, index) => {
+    const value = inputs[index].value.trim();
+    player.name = value || defaultNames[index] || `玩家 ${index + 1}`;
+    const nextRole = roleSelects[index] ? roleSelects[index].value : player.role;
+    if (nextRole !== player.role){
+      player.skillUsed = false;
+      player.skillCooldown = 0;
+    }
+    player.role = nextRole;
+  });
+  pushEvent("玩家名称和职业已更新，新的巡游队伍准备出发。");
+  render();
+  saveState();
+}
+
+function resetGame(){
+  const confirmed = confirm("确定要重置所有分数和事件吗？");
+  if (!confirmed) return;
+  createPlayers(Number(els.playerCount.value));
+  syncNameInputs();
+  pushEvent("新一轮课堂积分赛开始。");
+  render();
+  saveState();
+  launchFireworks(2);
+}
+
+els.players.addEventListener("click", event => {
+  const nameTap = event.target.closest("[data-secret-id]");
+  if (nameTap){
+    handleSecretNameTap(nameTap.dataset.secretId);
+    return;
+  }
+  const skillButton = event.target.closest("button[data-skill-id]");
+  if (skillButton){
+    useRoleSkill(skillButton.dataset.skillId);
+    return;
+  }
+  const companyButton = event.target.closest("button[data-company-id]");
+  if (companyButton){
+    openCompany(companyButton.dataset.companyId);
+    return;
+  }
+  const cardButton = event.target.closest("button[data-card-id]");
+  if (cardButton){
+    useCard(cardButton.dataset.cardId);
+    return;
+  }
+  const button = event.target.closest("button[data-id]");
+  if (!button) return;
+  addScore(button.dataset.id, Number(button.dataset.score));
+});
+
+els.playerCount.addEventListener("change", () => {
+  const count = Number(els.playerCount.value);
+  const oldPlayers = players;
+  snapshot();
+  players = Array.from({length: count}, (_, index) => oldPlayers[index] || {
+    id: crypto.randomUUID ? crypto.randomUUID() : String(Date.now() + index),
+    name: defaultNames[index] || `玩家 ${index + 1}`,
+    score: 0,
+    color: palettes[index],
+    frozen: false,
+    streak: 0,
+    role: roleOrder[index % roleOrder.length],
+    skillUsed: false,
+    skillCooldown: 0,
+    inventory: [],
+    property: null
+  });
+  players.forEach((player, index) => player.color = palettes[index]);
+  normalizePlayers();
+  syncNameInputs();
+  pushEvent(`玩家人数调整为 ${count} 位。`);
+  render();
+  saveState();
+});
+
+els.applyNames.addEventListener("click", applyNames);
+els.tabButtons.forEach(button => {
+  button.addEventListener("click", () => setAuxTab(button.dataset.tab));
+});
+els.spinBtn.addEventListener("click", spinResponderWheel);
+els.clearSelectionBtn.addEventListener("click", clearSelection);
+els.quickUndoBtn.addEventListener("click", restoreSnapshot);
+els.allPlusOneBtn.addEventListener("click", () => awardAll(1));
+els.allPlusTwoBtn.addEventListener("click", () => awardAll(2));
+els.undoBtn.addEventListener("click", restoreSnapshot);
+els.resetBtn.addEventListener("click", resetGame);
+els.soundBtn.addEventListener("click", () => {
+  soundOn = !soundOn;
+  if (soundOn) playTone("soft");
+  render();
+  saveState();
+});
+els.mysteryBtn.addEventListener("click", () => openModal(false));
+els.closeModal.addEventListener("click", () => els.modal.classList.remove("open"));
+els.modal.addEventListener("click", event => {
+  if (event.target === els.modal) els.modal.classList.remove("open");
+});
+els.revealBox.addEventListener("click", revealManualBox);
+window.addEventListener("resize", resizeCanvas);
+
+if (!loadState()){
+  createPlayers(4);
+  pushEvent("梦幻城堡亮灯，课堂积分赛准备开始。");
+}
+syncNameInputs();
+setAuxTab("game");
+resizeCanvas();
+animateFireworks();
+render();
+setTimeout(() => launchFireworks(2), 450);
+</script>
+</body>
+</html>

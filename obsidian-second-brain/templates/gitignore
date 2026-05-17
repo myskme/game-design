@@ -1,0 +1,23 @@
+# ===== Obsidian vault 的 .gitignore =====
+# 复制到 vault 根目录并改名为 .gitignore
+
+# macOS 杂项
+.DS_Store
+.Trashes
+Thumbs.db
+
+# Obsidian 的「工作区状态」—— 每台设备各自不同,不该同步
+# (同步它会导致设备间反复打架)
+.obsidian/workspace.json
+.obsidian/workspace-mobile.json
+.obsidian/cache
+
+# Obsidian 回收站
+.trash/
+
+# 临时文件
+*.tmp
+~$*
+
+# 说明:.obsidian/ 下的其余内容(主题、插件、快捷键等)
+# 建议保留同步,这样多台设备配置一致。

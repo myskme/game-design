@@ -1,0 +1,49 @@
+# 每日自动整理 —— 可选的进阶玩法
+# 复制到 vault 仓库的 .github/workflows/daily-digest.yml
+#
+# 作用:每天定时让 Claude 整理收件箱、写当日摘要,然后自动提交。
+# 前提:
+#   1. 在 vault 仓库 Settings → Secrets → Actions 添加 ANTHROPIC_API_KEY
+#   2. vault 仓库 Settings → Actions → General → Workflow permissions
+#      勾选 "Read and write permissions"
+#
+# 不想用 API key 计费的话,跳过本文件,改用 README 第 7 步的
+# 「Claude Code on web 定时会话」即可。
+
+name: daily-digest
+
+on:
+  schedule:
+    # UTC 时间;22:00 UTC ≈ 北京时间次日 06:00。按需调整。
+    - cron: "0 22 * * *"
+  workflow_dispatch: {}
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Claude 整理笔记
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: |
+            参照 CLAUDE.md 的约定:
+            1. 整理 00-inbox/ 下的笔记。
+            2. 在 10-daily/ 生成今天的每日摘要。
+            做完后把改动提交到当前分支。
+
+      - name: 推送改动
+        run: |
+          if [ -n "$(git status --porcelain)" ]; then
+            git config user.name  "daily-digest-bot"
+            git config user.email "actions@github.com"
+            git add -A
+            git commit -m "chore: 每日自动整理"
+            git push
+          else
+            echo "无改动,跳过提交。"
+          fi

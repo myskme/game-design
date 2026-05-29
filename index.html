@@ -136,7 +136,7 @@ h1 {
 
 .launch-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(245px, 1fr));
   gap: 16px;
 }
 
@@ -269,6 +269,17 @@ h1 {
     </section>
 
     <section class="launch-grid" aria-label="作品入口">
+      <a class="launch-card" href="myskme_midsummer_twelve_houses.html" style="--art: url('assets/loot-card-sheet.png')">
+        <div class="launch-content">
+          <div class="tag">Roguelite</div>
+          <div>
+            <h2 class="card-title">MYSKME 盛夏十二宫</h2>
+            <div class="card-meta">课堂行动值协作战斗 · 单文件版</div>
+          </div>
+          <div class="go" aria-hidden="true">›</div>
+        </div>
+      </a>
+
       <a class="launch-card" href="梦幻城堡课堂积分器.html" style="--art: url('assets/castle-harbor-hero.png')">
         <div class="launch-content">
           <div class="tag">Classroom</div>
